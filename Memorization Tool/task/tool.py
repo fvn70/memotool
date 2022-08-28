@@ -20,11 +20,50 @@ def list_cards():
     if rows:
         for r in rows:
             print(f"\nQuestion: {r.question}")
-            print('Please press "y" to see the answer or press "n" to skip:')
-            if input() == 'y':
-                print(f"\nAnswer: {r.answer}")
+            while True:
+                print(menu3)
+                cmd = input()
+                if cmd == 'y':
+                    print(f"\nAnswer: {r.answer}")
+                    break
+                elif cmd == 'u':
+                    upd_card(r)
+                    break
+                elif cmd == 'n':
+                    break
+                else:
+                    print(f'\n{cmd} is not an option')
     else:
         print('\nThere is no flashcard to practice!')
+
+
+def upd_card(card):
+    while True:
+        print(menu4)
+        cmd = input()
+        if cmd == 'd':
+            del_card(card)
+        elif cmd == 'e':
+            edit_card(card)
+        else:
+            print(f'\n{cmd} is not an option')
+            continue
+        break
+
+def del_card(card):
+    session.delete(card)
+    session.commit()
+
+def edit_card(card):
+    print(f'current question: {card.question}')
+    q = input('please write a new question:\n')
+    print(f'current answer: {card.answer}')
+    a = input('please write a new answer:\n')
+    if q.strip():
+        card.question = q
+    if a.strip():
+        card.answer = a
+    session.commit()
 
 def add_cards():
     while True:
@@ -59,6 +98,15 @@ menu1 = '''
 menu2 = '''
 1. Add a new flashcard
 2. Exit'''
+
+menu3 = '''press "y" to see the answer:
+press "n" to skip:
+press "u" to update:
+'''
+
+menu4 = '''press "d" to delete the flashcard:
+press "e" to edit the flashcard:
+'''
 
 Base.metadata.create_all(engine)
 
