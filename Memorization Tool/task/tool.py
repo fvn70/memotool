@@ -14,6 +14,7 @@ class Card(Base):
     id = Column(Integer, primary_key=True)
     question = Column(String)
     answer = Column(String)
+    box = Column(Integer, default=0)
 
 def list_cards():
     rows = session.query(Card).all()
@@ -25,17 +26,40 @@ def list_cards():
                 cmd = input()
                 if cmd == 'y':
                     print(f"\nAnswer: {r.answer}")
+                    if upd_box(r, r.box):
+                        break
+                    else:
+                        return
+                elif cmd == 'n':
                     break
                 elif cmd == 'u':
                     upd_card(r)
-                    break
-                elif cmd == 'n':
                     break
                 else:
                     print(f'\n{cmd} is not an option')
     else:
         print('\nThere is no flashcard to practice!')
 
+def upd_box(row, num):
+    while True:
+        print(menu5)
+        cmd = input()
+        if cmd == 'y':
+            if num == 2:
+                query = session.query(Card).filter(Card.id == row.id)
+                query.delete()
+                session.commit()
+
+                return False
+            else:
+                row.box = num + 1
+        elif cmd == 'n':
+            row.box = 0
+        else:
+            print(f'\n{cmd} is not an option')
+            continue
+        session.commit()
+        return True
 
 def upd_card(card):
     while True:
@@ -101,11 +125,16 @@ menu2 = '''
 
 menu3 = '''press "y" to see the answer:
 press "n" to skip:
-press "u" to update:
+press "u" to update:'''
+
+menu4 = '''
+press "d" to delete the flashcard:
+press "e" to edit the flashcard:
 '''
 
-menu4 = '''press "d" to delete the flashcard:
-press "e" to edit the flashcard:
+menu5 = '''
+press "y" if your answer is correct:
+press "n" if your answer is wrong:
 '''
 
 Base.metadata.create_all(engine)
